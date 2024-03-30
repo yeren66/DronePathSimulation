@@ -83,7 +83,12 @@ def node_by_order(drone_coordinate, coordinate_list, order_list):
             coordinate_list.append(drone_coordinate)
 
     return coordinate_list
-        
+
+def parse_code(file_path, drone_coordinate=(0, 0, 0), coordinate_list=[]):
+    code_snippet = read_file(file_path)
+    order_list = extract_order(code_snippet)
+    coordinate_list = node_by_order(drone_coordinate, coordinate_list, order_list)
+    return coordinate_list
 
 if __name__ == "__main__":
     matrix_size = (15, 15, 15)

@@ -56,7 +56,31 @@ def draw_scene(matrix, ax=None):
     if flag == 1:
         plt.show()
 
-def draw_combined(points, matrix):
+def draw_start_end(start, end, ax=None):
+    flag = 0
+    if ax is None:
+        flag = 1
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        # 设置坐标轴范围
+        ax.set_xlim([0, 150])
+        ax.set_ylim([0, 150])
+        ax.set_zlim([0, 150])
+
+        # 设置坐标轴标签
+        ax.set_xlabel('X Axis')
+        ax.set_ylabel('Y Axis')
+        ax.set_zlabel('Z Axis')
+    # 绘制起点和终点
+    ax.scatter(start[0], start[1], start[2], color='green', s=100)
+    ax.scatter(end[0], end[1], end[2], color='red', s=100)
+
+    if flag == 1:
+        plt.show()
+
+def draw_combined(points=None, matrix=None, start=None, end=None):
+    if points is None and matrix is None and start is None and end is None:
+        return  
     # 创建图形和3D坐标轴
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
@@ -72,8 +96,12 @@ def draw_combined(points, matrix):
     ax.set_zlabel('Z Axis')
 
     # 绘制路径和场景
-    draw_path(points, ax)
-    draw_scene(matrix, ax)
+    if points is not None:
+        draw_path(points, ax)
+    if matrix is not None:
+        draw_scene(matrix, ax)
+    if start is not None and end is not None:
+        draw_start_end(start, end, ax)
 
     # 显示图形
     plt.show()
@@ -94,5 +122,11 @@ if __name__ == "__main__":
 
     draw_scene(matrix)
 
-    draw_combined(points, matrix)
+    # 定义起点和终点
+    start = (0, 0, 0)
+    end = (100, 100, 100)
+
+    draw_start_end(start, end)
+
+    draw_combined(points, matrix, start, end)
 
