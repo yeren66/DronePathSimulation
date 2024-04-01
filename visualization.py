@@ -3,6 +3,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 
 
+
 def draw_path(points, ax=None):
     flag = 0
     if ax is None:
