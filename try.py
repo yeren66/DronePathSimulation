@@ -1,49 +1,56 @@
-import tkinter as tk
-from tkinter import ttk
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.patches import FancyArrowPatch
+from mpl_toolkits.mplot3d import proj3d
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D, proj3d
+from matplotlib.patches import FancyArrowPatch
 import numpy as np
-from visualization import draw_scene, draw_path, draw_start_end
 
-def draw_plot():
-    # 获取输入并处理
-    try:
-        input_str = coord_text.get("1.0", tk.END)  # 从Text控件获取文本
-        input_str = input_str.strip()  # 去除首尾空白字符，包括换行符
-        # 假设输入格式为: x,y,z;x,y,z;x,y,z
-        coord_list = np.array([list(map(float, item.split(','))) for item in input_str.split('\n')])
-        
-        # 绘图
-        fig.clear()
-        ax = fig.add_subplot(111, projection='3d')
-        draw_path(coord_list, ax=ax)
-        # ax = fig.add_subplot(111, projection='3d')
-        # ax.scatter(coord_list[:,0], coord_list[:,1], coord_list[:,2])
-        canvas.draw()
-    except ValueError:
-        pass  # 或者在GUI中显示错误消息
+class Arrow3D(FancyArrowPatch):
+    def __init__(self, xs, ys, zs, *args, **kwargs):
+        FancyArrowPatch.__init__(self, (0, 0), (0, 0), *args, **kwargs)
+        self._verts3d = xs, ys, zs
 
+    def draw(self, renderer):
+        xs3d, ys3d, zs3d = self._verts3d
+        xs, ys, zs = proj3d.proj_transform(xs3d, ys3d, zs3d,  self.axes.M)
+        self.set_positions((xs[0], ys[0]), (xs[1], ys[1]))
+        FancyArrowPatch.draw(self, renderer)
 
+    def set_3d_properties(self):
+        xs, ys, zs = self._verts3d
+        self._verts2d = proj3d.proj_transform(xs, ys, zs, self.axes.M)[:2]
 
-app = tk.Tk()
-app.title("无人机飞行路径绘制图形界面")
+    def do_3d_projection(self, renderer=None):
+        xs3d, ys3d, zs3d = self._verts3d
+        xs, ys, zs = proj3d.proj_transform(xs3d, ys3d, zs3d, self.axes.M)
+        self.set_positions((xs[0],ys[0]),(xs[1],ys[1]))
 
-left_frame = ttk.Frame(app)
-left_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        return np.min(zs)
 
-right_frame = ttk.Frame(app)
-right_frame.pack(side=tk.RIGHT, fill=tk.Y)
+def draw_path_with_arrows(points, ax):
+    global path_number
+    x, y, z = zip(*points)
+    color = ['g', 'b', 'c', 'm', 'y', 'k']
 
-fig = Figure(figsize=(5, 4), dpi=100)
-canvas = FigureCanvasTkAgg(fig, master=left_frame)
-canvas.draw()
-canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+    # 绘制路径
+    ax.plot(x, y, z, color=color[path_number % 6])
 
-# 使用Text控件替换原来的Entry控件
-coord_text = tk.Text(right_frame, width=20, height=10)  # 设置Text控件的大小
-coord_text.pack()
-draw_button = tk.Button(right_frame, text="绘制", command=draw_plot)
-draw_button.pack()
+    # 在路径上添加箭头
+    num_arrows = len(points) - 1
+    for i in range(num_arrows):
+        start_point = points[i]
+        end_point = points[i + 1]
+        arrow = Arrow3D([start_point[0], end_point[0]], [start_point[1], end_point[1]], [start_point[2], end_point[2]],
+                        mutation_scale=20, lw=1, arrowstyle="-|>", color=color[path_number % 6])
+        ax.add_artist(arrow)
+    
+    path_number += 1
 
-
-app.mainloop()
+# 示例用法
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+path_number = 0
+# 示例 points
+points = [(0, 0, 0), (1, 1, 1), (2, 0, 2)]
+draw_path_with_arrows(points, ax)
+plt.show()
