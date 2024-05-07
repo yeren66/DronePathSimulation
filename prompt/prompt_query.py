@@ -47,7 +47,7 @@ The dictionary that you return should be formatted as python dictionary. Follow 
 1. The first element should be takeOff() to take off.
 2. The last element should be flyCtrl() to land.
 3. Make sure that each element of the ["step_instructions"] explains corresponding element of the ["task_sequence"]. Refer to "FLY CONTROL CODES LIST" to understand the elements of ["task_sequence"]
-4. The length of the ["step_instructions"] list must be the same as the length of the ["task_sequence"] list.
+4. The length of the ["step_instructions"] list must be the same as the length of the ["task_sequence"] list and the length of the ["drone_position"] list. 
 5. Never left ',' at the end of the list.
 6. All keys of the dictionary should be double-quoted.
 7. Insert ``` at the beginning and the end of the dictionary to separate it from the rest of your response.
@@ -56,5 +56,28 @@ Adhere to the output format I defined above. Think step by step. Good luck!
 
     return prompt
 
+def task2():
+    prompt = """Start working. Resume from the environment below.
+\"\"\"
+{"environment size": "100 * 100",
+"block1": (0:60, 20:40),
+"block2": (40:100, 60:80),
+"start point": (0, 0),
+"destination": (100, 100)}
+\"\"\"
+The instruction is as follows:
+\"\"\"
+Instructions: "Fly to the destination avoiding the block."
+\"\"\"
+The dictionary that you return should be formatted as python dictionary. Follow these rules:
+1. Refer to "FLY CONTROL CODES LIST" to understand the elements of ["action_sequence"]
+2. Never left ',' at the end of the list.
+3. All keys of the dictionary should be double-quoted.
+4. Insert ``` at the beginning and the end of the dictionary to separate it from the rest of your response.
+Adhere to the output format I defined above. Think step by step. Good luck!
+"""
+
+    return prompt
+
 if __name__ == "__main__":
-    print(task1())
+    print(task2())

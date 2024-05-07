@@ -10,11 +10,11 @@ def prompt_role():
 def prompt_env():
     prompt = "Information about environments and objects are given as python dictionary. Example:\n"
     prompt += """\"\"\"
-{"environment size": "length * width * height", 
-"block1": (x1:x2, y1:y2, z1:z2),
-"block2": (x1:x2, y1:y2, z1:z2),
-"start point": (x, y, z),
-"destination": (x, y, z)}
+{"environment size": "length * width * height", # The size of the environment.
+"block1": (x1:x2, y1:y2, z1:z2), # The position of the block1(format like numpy).
+"block2": (x1:x2, y1:y2, z1:z2), # The position of the block2(format like numpy).
+"start point": (x, y, z),   # The position of the drone start to fly
+"destination": (x, y, z)}  # The position of the drone fly to
 \"\"\"
 -------------------------------------------------------
 The texts above are part of the overall instruction. Do not start working yet:
@@ -99,11 +99,11 @@ Instructions: "Fly to the destination avoiding the block."
 \"\"\"
 - Input:
 {
-    "environment size": "200 * 200 * 200",
-    "block1": "(0:150, 50:150, 0:150)",
-    "block2": "(160:180, 0:100, 0:200)",
+    "environment size": "100 * 100 * 100",
+    "block1": "(0:60, 30:60, 0:100)",
+    "block2": "(40:100, 0:50, 0:100)",
     "start point": "(0, 0, 0)",
-    "destination": "(200, 0, 0)"
+    "destination": "(100, 0, 0)"
 }
 Instructions: "Fly to the destination avoiding the block."
 
@@ -113,36 +113,77 @@ Instructions: "Fly to the destination avoiding the block."
     {
         "task_sequence": [
             "takeOff(0, 60)", 
-            "moveCtrl(0, 0, 150)", 
-            "moveCtrl(0, 1, 120)", 
-            "moveCtrl(0, 0, 50)",
-            "moveCtrl(0, 4, 120)",
+            "moveCtrl(0, 0, 70)", 
+            "moveCtrl(0, 1, 60)", 
+            "moveCtrl(0, 0, 30)",
+            "moveCtrl(0, 4, 60)",
             "flyCtrl(0, 0)"
         ],
         "step_instructions": [
             "Take off to 60cm height.",
-            "Move 150cm in the x direction.",
-            "Move 120cm in the y direction.",
-            "Move 50cm in the x direction.",
-            "Move 120cm in the -y direction.",
+            "Move 70cm in the x direction.",
+            "Move 60cm in the y direction.",
+            "Move 30cm in the x direction.",
+            "Move 60cm in the -y direction.",
             "Land."
         ],
         "drone_position": [
             "(0, 0, 60)",
-            "(150, 0, 60)",
-            "(150, 120, 60)",
-            "(200, 120, 60)",
-            "(200, 0, 60)",
-            "(200, 0, 0)"
+            "(70, 0, 60)",
+            "(70, 60, 60)",
+            "(100, 60, 60)",
+            "(100, 0, 60)",
+            "(100, 0, 0)"
         ]
     },
     "drone_before": "(0, 0, 0)",
-    "drone_after": "(200, 0, 0)",
+    "drone_after": "(100, 0, 0)",
     "instruction_summary": "Fly to the destination avoiding the blocks.",
     "question": ""
 }
 """
-
+    prompt += """Example3:
+\"\"\"
+- Input:
+{"environment size": "100 * 100 * 100",
+"block1": (40:60, 40:60, 0:100),
+"start point": (0, 0, 0),
+"destination": (0, 0, 0)}
+Instructions: "Fly around the block and back to start point."
+- Output:
+{"task_cohesion": 
+    {"task_sequence": [
+        "takeOff(0, 50)", 
+        "moveCtrl(0, 0, 100)", 
+        "moveCtrl(0, 1, 100)", 
+        "moveCtrl(0, 3, 100)",
+        "moveCtrl(0, 4, 100)",
+        "flyCtrl(0, 0)"
+        ],
+    "step_instructions": [
+        "Take off to 50cm height.",
+        "Move 100cm to the x direction.",
+        "Move 100cm to the y direction.",
+        "Move 100cm to the -x direction.",
+        "Move 100cm to the -y direction.",
+        "Land."
+        ],
+    "drone_position": [
+        (0, 0, 50),
+        (100, 0, 50),
+        (100, 100, 50),
+        (0, 100, 50),
+        (0, 0, 50),
+        (0, 0, 0)
+    ]
+    },
+    "drone_before": (0, 0, 0),
+    "drone_after": (0, 0, 0),
+    "instruction_summary": "Fly to the destination avoiding the block.",
+    "question": ""
+    }
+\"\"\"
+""" 
     prompt += """-------------------------------------------------------
 The texts above are part of the overall instruction. Do not start working yet:
 """
@@ -152,9 +193,9 @@ def common_gpt_reply():
     return "Understood. I will wait for further instructions before starting to work."
 
 if __name__ == "__main__":
-    # print(prompt_role())
-    # print(prompt_env())
-    # print(prompt_function())
-    # print(prompt_output_format())
+    print(prompt_role())
+    print(prompt_env())
+    print(prompt_function())
+    print(prompt_output_format())
     print(prompt_example())
     # print(common_gpt_reply())
